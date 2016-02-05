@@ -1,0 +1,217 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <script>
+            //this function shows the book info if you select a book from the drop down
+            function drpJSON() {
+                
+                //data_file holds the "BookJson.json" information as an object
+                var data_file = "BookJson.json";
+                var http_request = new XMLHttpRequest();//ajax request
+
+                //AJAX request based off of browswer
+                try {
+                    // Opera 8.0+, Firefox, Chrome, Safari
+                    http_request = new XMLHttpRequest();
+
+                } catch (e) {
+                    // Internet Explorer Browsers
+                    try {
+                        http_request = new ActiveXObject("Msxml2.XMLHTTP");
+                    } catch (e) {
+                        try {
+                            http_request = new ActiveXObject("Microsoft.XMLHTTP");
+                        } catch (e) {
+                            // Something went wrong
+                            alert("Your browser broke!");
+                            return false;
+                        }
+                    }
+                }
+                
+                //onreadystatechange designates a function to be called when readyState property changes
+                http_request.onreadystatechange = function () {
+                    //if readyState == 4, the server has returned the information and is ready
+                    if (http_request.readyState == 4) {
+                        // Javascript function JSON.parse to parse JSON data
+                        var jsonObj = JSON.parse(http_request.responseText);
+                        // jsonObj variable now contains the data structure and can
+                        // be accessed as jsonObj.name and jsonObj.country.
+                        
+                        var text = ""; //text will hold all the HTML code as a string
+                        
+                        //loop through the array 'jsonObj.book'
+                        for (var i = 0; i < jsonObj.book.length; i++) {
+                            //check if book.authorid and "Booksel.value" (Booksel.valu is dropdown list value from below)
+                            //are the same and also check that they are not both generic nothing
+                            //if so, the book selected from dropdown is the same as the book in this loop
+                            //concatanate 'text' with html of the book title and author, splus a <br> to go to next line
+                            if (jsonObj.book[i].authorid == document.getElementById("BookSel").value && document.getElementById("BookSel").value != 0) {
+                                text = text + jsonObj.book[i].Title + " " + jsonObj.book[i].Author + "<br>";
+                                var selection = i; //selection holds the index value of the book once it's found in the array
+                                console.log(i); //for bug testing purposes
+                            }
+                        }
+                        console.log(selection); //bug testing
+                        
+                        //write the value of 'text' in the div 'booklist' this prints the Title and Author
+                        document.getElementById("booklist").innerHTML = text;
+                        //write the value of 'Title' based on the array index 'selection' in div 'Title'
+                        document.getElementById("Title").innerHTML = jsonObj.book[selection].Title;
+                        //write the value of 'Author' based on the array index 'selection' in div 'Author'
+                        document.getElementById("Author").innerHTML = jsonObj.book[selection].Author;
+                    }
+                }
+                //use a "GET" request to open data_file ("BookJson.json"), true means to run function when ready
+                http_request.open("GET", data_file, true);
+                http_request.send();
+            }
+            
+            
+            //this function happens when user types in author name and hits "Pick"
+            function wrtJSON() {
+
+                //data_file holds the "BookJson.json" information as an object
+                var data_file = "BookJson.json";
+                var http_request = new XMLHttpRequest(); //AJAX call
+
+                //AJAX request based on browser
+                try {
+                    // Opera 8.0+, Firefox, Chrome, Safari
+                    http_request = new XMLHttpRequest();
+
+                } catch (e) {
+                    // Internet Explorer Browsers
+                    try {
+                        http_request = new ActiveXObject("Msxml2.XMLHTTP");
+                    } catch (e) {
+                        try {
+                            http_request = new ActiveXObject("Microsoft.XMLHTTP");
+                        } catch (e) {
+                            // Something went wrong
+                            alert("Your browser broke!");
+                            return false;
+                        }
+                    }
+                }
+                
+                //onreadystatechange designates a function to be called when readyState property changes
+                http_request.onreadystatechange = function () {
+                    if (http_request.readyState == 4) {
+                        // Javascript function JSON.parse to parse JSON data
+                        var jsonObj = JSON.parse(http_request.responseText);
+                        // jsonObj variable now contains the data structure and can
+                        // be accessed as jsonObj.name and jsonObj.country.
+                        
+                        //'text' will hold string value to be submitted
+                        var text = "";
+                        
+                        //loop through the array 'jsonObj.book'
+                        for (var i = 0; i < jsonObj.book.length; i++) {
+                            //if jsonObj.book.Author at this index is the same and not a null value as in the list
+                            if (jsonObj.book[i].Author.indexOf(document.getElementById("AuthorName").value) > -1 && document.getElementById("AuthorName").value != "") {
+                                if (text.length > 0) {
+                                    text = "";//reset the value of 'text'
+                                }
+                                
+                                //'text' is "Title" + "Author + <br>
+                                text = text + jsonObj.book[i].Title + " " + jsonObj.book[i].Author + "<br>";
+                                var selection = i; //selection holds the index value of this book in the array
+                                console.log(i); //for bug finding
+                            }
+                        }
+                        console.log(selection);//for bug finding
+                        
+                        //text within 'booklist' div is now value of 'text'
+                        document.getElementById("booklist").innerHTML = text;
+                        
+                        //text within 'Title' div is now value of 'Title' in array at index 'selection'
+                        document.getElementById("Title").innerHTML = jsonObj.book[selection].Title;
+                        //text within 'Author' div is now value of 'Author' in array at index 'selection'
+                        document.getElementById("Author").innerHTML = jsonObj.book[selection].Author;
+                    }
+                }
+                //use a "GET" request to open data_file ("BookJson.json"), true means to run function when ready
+                http_request.open("GET", data_file, true);
+                http_request.send();
+            }
+        </script>
+        <title>JSON Using AJAX</title>
+    </head>
+    <body>
+        <h1>Book Details</h1>
+        <table class="src" >
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+            </tr>
+            <tr>
+                <td><div id="Title">None Selected</div></td>
+                <td><div id="Author">None Selected</div></td>
+            </tr>
+            <tr>
+                <td><div id="booklist">some books</div></td>
+                <td></td>
+            </tr>
+        </table>
+        <div class="central">Select a Book Number:
+            <select id='BookSel' onchange ="drpJSON()">
+
+            </select>
+            Or Enter a Author: <input type="text" name="AuthorName" id="AuthorName">
+            <input type="button" onclick="wrtJSON()" value="Pick">
+        </div>
+        
+        <script>
+            //drop down list script
+            
+            //read the JSON file  "data_file" holds info from "BookJson.json"
+            var data_file = "BookJson.json";
+            var http_request = new XMLHttpRequest();
+
+            //check browswers for correct AJAX call
+            try {
+                // Opera 8.0+, Firefox, Chrome, Safari
+                http_request = new XMLHttpRequest();
+
+            } catch (e) {
+                // Internet Explorer Browsers
+                try {
+                    http_request = new ActiveXObject("Msxml2.XMLHTTP");
+                } catch (e) {
+                    try {
+                        http_request = new ActiveXObject("Microsoft.XMLHTTP");
+                    } catch (e) {
+                        // Something went wrong
+                        alert("Your browser broke!");
+                    }
+                }
+            }
+            
+            //onreadystatechange designates a funciton to be called when readyState property changes
+            http_request.onreadystatechange = function () {
+                //listen for server response "4" means request is finished and response is ready
+                if (http_request.readyState == 4) {
+                    // Javascript function JSON.parse to parse JSON data
+                    var jsonObj = JSON.parse(http_request.responseText);
+                    var text = "<option value='0'>--</option>";//begin the list
+                    
+                    //scroll through array adding html + book info to string "text" which will create the list
+                    for (var i = 0; i < jsonObj.book.length; i++) {
+                        text = text + "<option value = '" + jsonObj.book[i].authorid + "'> " + jsonObj.book[i].Title + "</option>";
+                    }
+                    //find div "BookSel" and put value of "text" in there
+                    //this propogates the list because of the HTML in 'text'
+                    document.getElementById("BookSel").innerHTML = text;
+                }
+            }
+            
+            //use a "GET" request to open data_file ("BookJson.json"), true means to run function when ready
+            http_request.open("GET", data_file, true);
+            http_request.send();
+        </script>
+    </body>
+
+
+</html>
