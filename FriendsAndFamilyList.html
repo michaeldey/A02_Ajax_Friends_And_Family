@@ -1,23 +1,181 @@
 <!DOCTYPE html>
 <!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
+Michael Dey
+CSIS 2470-002 Advanced Javascript
+Assignment: AJAX/JSON Friends and Family
+
+can be found at this address:
+http://ec2-54-213-33-5.us-west-2.compute.amazonaws.com/AssignmentFiles/AJAX_JSON_FriendsAndFamily/A02_Ajax_Friends_And_Family/FriendsAndFamilyList.html
 -->
 <html>
     <head>
-        <title>TODO supply a title</title>
+        <title>Mike's Friends & Family</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {
+                font-family: "Trebuchet MS", Helvetica, sans-serif;
+                font-size: 1em;
+                color: #222222;
+                background-color: #D2D6DD;
+                margin-left: 10px;
+            }
+            
+        </style>
+        
+        <script>
+            //this function shows the name info if you select a name from the drop down
+            function drpJSON() {
+                
+                //data_file holds the "FriendsAndFamily.json" information as an object
+                var data_file = "FriendsAndFamily.json";
+                var http_request = new XMLHttpRequest();//ajax request
+
+                //AJAX request based off of browswer
+                try {
+                    // Opera 8.0+, Firefox, Chrome, Safari
+                    http_request = new XMLHttpRequest();
+
+                } catch (e) {
+                    // Internet Explorer Browsers
+                    try {
+                        http_request = new ActiveXObject("Msxml2.XMLHTTP");
+                    } catch (e) {
+                        try {
+                            http_request = new ActiveXObject("Microsoft.XMLHTTP");
+                        } catch (e) {
+                            // Something went wrong
+                            alert("Your browser broke!");
+                            return false;
+                        }
+                    }
+                }
+                
+                //onreadystatechange designates a function to be called when readyState property changes
+                http_request.onreadystatechange = function () {
+                    //if readyState == 4, the server has returned the information and is ready
+                    if (http_request.readyState == 4) {
+                        // Javascript function JSON.parse to parse JSON data
+                        var jsonObj = JSON.parse(http_request.responseText);
+                        // jsonObj variable now contains the data structure and can
+                        // be accessed as jsonObj.name and jsonObj.country.
+                        
+                        var text = ""; //text will hold all the HTML code as a string
+                        
+                        //loop through the array 'jsonObj.people'
+                        for (var i = 0; i < jsonObj.people.length; i++) {
+                            //check if people and "Names.value" (Names.value is dropdown list value from below)
+                            //are the same and also check that they are not both generic nothing
+                            //if so, the name selected from dropdown is the same as the name in this loop
+                            //concatanate 'text' with html of the book title and author, splus a <br> to go to next line
+                            if ((jsonObj.people[i].name == document.getElementById("Names").value && document.getElementById("Names").value != 0)||
+                                (jsonObj.people[i].relation == document.getElementById("Relations").value && document.getElementById("Relations").value != 0)) {
+                                text = text + jsonObj.people[i].name + " " + jsonObj.people[i].lname + " <b>" + jsonObj.people[i].relation + "</b><br>";
+                                var selection = i; //selection holds the index value of the book once it's found in the array
+                                console.log(i); //for bug testing purposes
+                            }
+                        }
+                        console.log(selection); //bug testing
+                        
+                        //write the value of 'text' in the div 'booklist' this prints the Title and Author
+                        document.getElementById("fullName").innerHTML = text;
+                    }
+                }
+                //use a "GET" request to open data_file ("BookJson.json"), true means to run function when ready
+                http_request.open("GET", data_file, true);
+                http_request.send();
+            }
+            
+            //this function happens when user types in name and hits "Pick"
+            function wrtJSON() {
+
+                //data_file holds the "FriendsAndFamily.json" information as an object
+                var data_file = "FriendsAndFamily.json";
+                var http_request = new XMLHttpRequest(); //AJAX call
+
+                //AJAX request based on browser
+                try {
+                    // Opera 8.0+, Firefox, Chrome, Safari
+                    http_request = new XMLHttpRequest();
+
+                } catch (e) {
+                    // Internet Explorer Browsers
+                    try {
+                        http_request = new ActiveXObject("Msxml2.XMLHTTP");
+                    } catch (e) {
+                        try {
+                            http_request = new ActiveXObject("Microsoft.XMLHTTP");
+                        } catch (e) {
+                            // Something went wrong
+                            alert("Your browser broke!");
+                            return false;
+                        }
+                    }
+                }
+                
+                //onreadystatechange designates a function to be called when readyState property changes
+                http_request.onreadystatechange = function () {
+                    if (http_request.readyState == 4) {
+                        // Javascript function JSON.parse to parse JSON data
+                        var jsonObj = JSON.parse(http_request.responseText);
+                        // jsonObj variable now contains the data structure and can
+                        // be accessed as jsonObj.name and jsonObj.country.
+                        
+                        //'text' will hold string value to be submitted
+                        var text = "";
+                        
+                        //loop through the array 'jsonObj.people'
+                        for (var i = 0; i < jsonObj.people.length; i++) {
+                            //look for a match in the text of first name, last name, or relationship
+                            if ((jsonObj.people[i].name.indexOf(document.getElementById("PersonName").value) > -1 && document.getElementById("PersonName").value != "")||
+                               (jsonObj.people[i].lname.indexOf(document.getElementById("PersonName").value) > -1 && document.getElementById("PersonName").value != "")||     
+                               (jsonObj.people[i].relation.indexOf(document.getElementById("PersonName").value) > -1 && document.getElementById("PersonName").value != "")){
+                                                               
+                                //'text' is "Title" + "Author + <br>
+                                text = text + jsonObj.people[i].name + " " + jsonObj.people[i].lname + " <b>" + jsonObj.people[i].relation + "</b><br>";
+                                var selection = i; //selection holds the index value of this book in the array
+                                console.log(i); //for bug finding
+                            }else if (document.getElementById("PersonName").value == ""){
+                                text = text + jsonObj.people[i].name + " " + jsonObj.people[i].lname + " <b>" + jsonObj.people[i].relation + "</b><br>";
+                                var selection = i; //selection holds the index value of this book in the array
+                            }                            
+                            
+                        }
+                        
+                        //write the value of 'text' in the div 'booklist' this prints the Title and Author
+                        document.getElementById("fullName").innerHTML = text;
+                        
+                    }
+                }
+                //use a "GET" request to open data_file ("BookJson.json"), true means to run function when ready
+                http_request.open("GET", data_file, true);
+                http_request.send();
+            }
+            
+        </script>
     </head>
     <body>
+        <a href = "http://ec2-54-213-33-5.us-west-2.compute.amazonaws.com/index.html">
+            <img src = "MikeLogo3.png" width = "150">
+        </a><br><br>
+
         <h1>Friends and Family</h1>
         
-        <p>Names:
-            <select id = 'Names'>
+        <div id='fullName'>Full Names</div>
+        
+        <p>Search by:<br>
+            Name:            
+            <select id = 'Names' onchange ="drpJSON()"></select>
             
-            </select>
+            And/OR Relationship:
+            <select id ='Relations' onchange = "drpJSON()"></select>
         </p>
+        <p>
+            Or Enter a first name, last name, or relationship (leave blank for full list): <input type="text" name="PersonName" id="PersonName">
+            <input type="button" onclick="wrtJSON()" value="Pick">
+            
+        </p>
+        
         
         <script>
             //drop down list script
@@ -52,14 +210,19 @@ and open the template in the editor.
                     // Javascript function JSON.parse to parse JSON data
                     var jsonObj = JSON.parse(http_request.responseText);
                     var text = "<option value='0'>--</option>";//begin the list
+                    var relText = "<option value='0'>--</option>";//begin the list
                     
                     //scroll through array adding html + people first name to string "text" which will create the list
                     for (var i = 0; i < jsonObj.people.length; i++) {
                         text = text + "<option value = '" + jsonObj.people[i].name + "'> " + jsonObj.people[i].name + " " + jsonObj.people[i].lname +"</option>";
+                        relText = relText + "<option value = '" + jsonObj.people[i].relation + "'> " + jsonObj.people[i].relation + "</option>";
                     }
                     //find div "BookSel" and put value of "text" in there
                     //this propogates the list because of the HTML in 'text'
                     document.getElementById("Names").innerHTML = text;
+                    document.getElementById("Relations").innerHTML = relText;
+
+                    
                     
                 }
             }
