@@ -6,6 +6,8 @@ Assignment: AJAX/JSON Friends and Family
 
 can be found at this address:
 http://ec2-54-213-33-5.us-west-2.compute.amazonaws.com/AssignmentFiles/AJAX_JSON_FriendsAndFamily/A02_Ajax_Friends_And_Family/FriendsAndFamilyList.html
+
+V2
 -->
 <html>
     <head>
@@ -211,12 +213,54 @@ http://ec2-54-213-33-5.us-west-2.compute.amazonaws.com/AssignmentFiles/AJAX_JSON
                     var jsonObj = JSON.parse(http_request.responseText);
                     var text = "<option value='0'>--</option>";//begin the list
                     var relText = "<option value='0'>--</option>";//begin the list
+                    var relArray = []; //this array will hold one each of the particular relationships
                     
+//                    //scroll through array adding html + people first name to string "text" which will create the list
+//                    for (var i = 0; i < jsonObj.people.length; i++) {
+//                        text = text + "<option value = '" + jsonObj.people[i].name + "'> " + jsonObj.people[i].name + " " + jsonObj.people[i].lname +"</option>";
+//                        relText = relText + "<option value = '" + jsonObj.people[i].relation + "'> " + jsonObj.people[i].relation + "</option>";
+//                    }
+             
                     //scroll through array adding html + people first name to string "text" which will create the list
                     for (var i = 0; i < jsonObj.people.length; i++) {
                         text = text + "<option value = '" + jsonObj.people[i].name + "'> " + jsonObj.people[i].name + " " + jsonObj.people[i].lname +"</option>";
-                        relText = relText + "<option value = '" + jsonObj.people[i].relation + "'> " + jsonObj.people[i].relation + "</option>";
+                        relArray.push(jsonObj.people[i].relation); 
                     }
+                    
+//                    for (var i = 0; i < relArray.length; i++) {
+//                        relText = relText + "<option value = '" + relArray[i] + "'> " + relArray[i] + "</option>";           
+//                    }
+
+//                    for (var i = 0; i < relArray.length; i++) {
+//                        tempText = relArray[i];
+//                        exists = false;
+//                        
+//                        
+//                        for (var j = 0; j < relArray.length; j++){
+//                            exists = relArray[j].valueOf() == tempText.valueOf();
+//                            if (exists){break;}
+//                            
+//                        }
+//                        
+//                        if (!exists) {
+//                            relText = relText + "<option value = '" + tempText + "'> " + tempText + "</option>";
+//                        }
+//
+//                    }
+                    for (var i = 0; i < relArray.length; i++){
+                        var tempArray = [];
+                        var m = tempArray.length;
+                        tempText = relArray[i];
+                        
+                        for (var j = 0; j < m; j++)
+                        {
+                            if (tempArray[j].valueOf() != relArray[i].valueOf()){
+                                tempArray.push(relArray[i]);
+                                relText = relText + "<option value = '" + relArray[i] + "'> " + relArray[i] + "</option>";
+                            }
+                        }
+                    }
+                    
                     //find div "BookSel" and put value of "text" in there
                     //this propogates the list because of the HTML in 'text'
                     document.getElementById("Names").innerHTML = text;
